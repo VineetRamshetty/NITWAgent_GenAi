@@ -1,0 +1,14 @@
+langchain
+langchain-core
+langchain-community
+langchain-huggingface
+transformers
+huggingface-hub
+python-dotenv
+numpy
+scikit-learn
+sentence-transformers
+chromadb
+streamlit
+tqdm
+pypdf
