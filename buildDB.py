@@ -7,7 +7,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 load_dotenv()
 
 def loadDocs():
-    textSplitter=RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+    textSplitter=RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
 
     docs=[]
     for p in sorted(Path("data").glob("*.txt")):
@@ -19,7 +19,10 @@ def loadDocs():
 def buildDB():
     docs=loadDocs()
 
-    embeddings=HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    embeddings=HuggingFaceEmbeddings(
+        model_name="sentence-transformers/paraphrase-MiniLM-L3-v2", 
+        model_kwargs={"device": "cpu"}
+    )
 
     db=Chroma.from_documents(documents=docs, embedding=embeddings, persist_directory="vectorDB")
     db.persist()
