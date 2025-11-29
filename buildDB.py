@@ -1,13 +1,13 @@
 from pathlib import Path
 from dotenv import load_dotenv
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
+from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 
 load_dotenv()
 
 def loadDocs():
-    textSplitter=RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    textSplitter=RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
 
     docs=[]
     for p in sorted(Path("data").glob("*.txt")):
@@ -24,8 +24,9 @@ def buildDB():
         model_kwargs={"device": "cpu"}
     )
 
-    db=Chroma.from_documents(documents=docs, embedding=embeddings, persist_directory="vectorDB")
-    db.persist()
+    db = FAISS.from_documents(docs, embeddings)
+    db.save_local("faiss_index")
+
 
 if __name__=="__main__":
     buildDB()

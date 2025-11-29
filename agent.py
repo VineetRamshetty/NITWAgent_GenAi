@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from langchain_community.vectorstores import Chroma
+from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings, HuggingFaceEndpoint, ChatHuggingFace
 from langchain_core.prompts import PromptTemplate
 
@@ -24,7 +24,8 @@ class NITWAgent:
             model_kwargs={"device": "cpu"}
         )
         
-        self.db=Chroma(persist_directory="vectorDB", embedding_function=self.embeddings)
+        self.db=FAISS.load_local("faiss_index", self.embeddings, allow_dangerous_deserialization=True)
+
 
         llm=HuggingFaceEndpoint(
             repo_id=model_repo,
@@ -43,7 +44,7 @@ class NITWAgent:
     def answer(self, question, k=4):
         docs=self.db.similarity_search(question, k=k)
         if not docs:
-            return "No relevant information found in the NITW vectorDB."
+            return "No relevant information found in the NITW dataset."
 
         context="\n\n".join(doc.page_content for doc in docs)
 
